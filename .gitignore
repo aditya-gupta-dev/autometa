@@ -1,6 +1,7 @@
 # dependencies (bun install)
 node_modules
 
+.env.example
 # output
 out
 dist
@@ -21,6 +22,11 @@ report.[0-9]_.[0-9]_.[0-9]_.[0-9]_.json
 .env.test.local
 .env.production.local
 .env.local
+
+# sqlite database files
+*.db
+*.db-wal
+*.db-shm
 
 # caches
 .eslintcache

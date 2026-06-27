@@ -1,0 +1,43 @@
+# Render Blueprint for the Autometa API.
+# Commit this file and create a new "Blueprint" service in the Render dashboard,
+# or use it as a reference when configuring a Web Service manually.
+#
+# Docs: https://render.com/docs/blueprint-spec
+services:
+  - type: web
+    name: autometa
+    runtime: node # Render builds with Bun via the install/start commands below.
+    plan: starter # 'free' works too, but the disk below requires a paid plan.
+    region: oregon
+    branch: main
+
+    # Install Bun, then dependencies. Render's Node env doesn't ship Bun, so we
+    # fetch it and put it on PATH for the build.
+    buildCommand: |
+      curl -fsSL https://bun.sh/install | bash
+      export PATH="$HOME/.bun/bin:$PATH"
+      bun install
+    startCommand: $HOME/.bun/bin/bun run index.ts
+
+    healthCheckPath: /health
+
+    # Persistent disk so the SQLite token store survives restarts/redeploys.
+    # Remove this block (and DATABASE_PATH) if you move tokens to an external DB.
+    disk:
+      name: autometa-data
+      mountPath: /var/data
+      sizeGB: 1
+
+    envVars:
+      - key: DATABASE_PATH
+        value: /var/data/autometa.db
+      # APP_URL must equal this service's public URL (no trailing slash),
+      # e.g. https://autometa.onrender.com. Set after the service is created.
+      - key: APP_URL
+        sync: false
+      - key: THREADS_APP_ID
+        sync: false
+      - key: THREADS_APP_SECRET
+        sync: false
+      - key: THREADS_WEBHOOK_VERIFY_TOKEN
+        sync: false
