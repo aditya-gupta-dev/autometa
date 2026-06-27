@@ -1,0 +1,22 @@
+# Convenience wrapper for local/self-hosted Docker deployment.
+#   docker compose up --build -d
+# Reads credentials from a local .env file (see .env.example).
+services:
+  autometa:
+    build: .
+    image: autometa:latest
+    restart: unless-stopped
+    ports:
+      - "${PORT:-3000}:3000"
+    environment:
+      APP_URL: ${APP_URL}
+      THREADS_APP_ID: ${THREADS_APP_ID}
+      THREADS_APP_SECRET: ${THREADS_APP_SECRET}
+      THREADS_WEBHOOK_VERIFY_TOKEN: ${THREADS_WEBHOOK_VERIFY_TOKEN}
+      # PORT inside the container stays 3000; map the host port above.
+      DATABASE_PATH: /data/autometa.db
+    volumes:
+      - autometa-data:/data
+
+volumes:
+  autometa-data:
